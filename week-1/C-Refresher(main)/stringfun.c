@@ -297,7 +297,7 @@ int main(int argc, char *argv[]) {
         exit(2);
     }
 
-    char *start = buff;
+    char *start = buff; 
 
     switch (opt){
         case 'c':
