@@ -3,7 +3,6 @@
 #include <fcntl.h> //c library for system call file routines
 #include <string.h>
 #include <sys/stat.h>
-//
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdbool.h>
@@ -13,9 +12,7 @@
 #include "sdbsc.h"
 
 //DEFINING ELEMENTS
-//#define DB_FILENAME "student.db"
 
-//#define TMP_DB_FILE "student.tmp"
 #define RECORD_SIZE sizeof(student_t)
 #define MAX_NAME_LEN 20
 
@@ -76,6 +73,38 @@ int open_db(char *dbFile, bool should_truncate)
  *
  *  console:  Does not produce any console I/O used by other functions
  */
+
+// NEW HELPER FUNCTION
+int check_empty_database(int fd)
+{
+    student_t temp;
+    
+    // Seek to the beginning of the file
+    if (lseek(fd, 0, SEEK_SET) == -1) {
+        perror("Error seeking in database");
+        return ERR_DB_FILE;
+    }
+
+    // Try to read the first record
+    ssize_t bytes_read = read(fd, &temp, RECORD_SIZE);
+
+    // Check if the file is empty (no records to read)
+    if (bytes_read == 0) {
+        // Database is empty
+        printf("Database contains no student records.\n");
+        return 1;  // Return 1 to indicate the database is empty
+    }
+    
+    // If there was an error reading the file
+    if (bytes_read == -1) {
+        perror("Error reading DB file");
+        return ERR_DB_FILE;
+    }
+
+    // Database is not empty, return 0
+    return 0;
+}
+
 int get_student(int fd, int id, student_t *s)
 {
     // TODO
